@@ -12,21 +12,19 @@ def check_url():
     
     if not url:
         return jsonify({"error": "URL is required"}), 400
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
     
     try:
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, headers=headers, timeout=5)
         return jsonify({
             "status_code": response.status_code,
             "status_message": response.reason
         })
-    except requests.exceptions.MissingSchema:
-        return jsonify({"status_message": "Invalid URL format", "status_code": 400})
-    except requests.exceptions.ConnectionError:
-        return jsonify({"status_message": "Site can't be reached", "status_code": 503})
-    except requests.exceptions.Timeout:
-        return jsonify({"status_message": "Request timed out", "status_code": 504})
     except requests.exceptions.RequestException as e:
-        return jsonify({"status_message": "Unknown error: " + str(e), "status_code": 500})
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
